@@ -58,3 +58,4 @@ Perfect for real-time features like chat, notifications, or dashboards.
 **Use Case:** Simple chat system where multiple clients can send and receive live messages.
 
 - /ws → WebSocket endpoint for connecting clients
+
