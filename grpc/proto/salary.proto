@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package salary;
+
+option go_package = "./proto;proto";
+
+message SalaryRequest {
+  string name = 1;
+  double base = 2;
+  double bonus_percent = 3;
+}
+
+message SalaryResponse {
+  string name = 1;
+  double total_salary = 2;
+  string message = 3;
+}
+
+service SalaryService {
+  rpc ComputeSalary (SalaryRequest) returns (SalaryResponse);
+}

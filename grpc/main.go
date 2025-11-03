@@ -10,25 +10,25 @@ import (
 	pb "grpc-api/proto"
 )
 
+// server implements the SalaryService
 type server struct {
-	pb.UnimplementedEmployeeServiceServer
-	employees []*pb.Employee
+	pb.UnimplementedSalaryServiceServer
 }
 
-func (s *server) GetEmployees(ctx context.Context, req *pb.GetEmployeesRequest) (*pb.GetEmployeesResponse, error) {
-	return &pb.GetEmployeesResponse{Employees: s.employees}, nil
-}
-
-func (s *server) AddEmployee(ctx context.Context, req *pb.AddEmployeeRequest) (*pb.AddEmployeeResponse, error) {
-	newEmp := &pb.Employee{
-		Id:      int32(len(s.employees) + 1),
-		Name:    req.Name,
-		Age:     req.Age,
-		Company: req.Company,
-		Health:  req.Health,
+// ComputeSalary calculates the total salary from base and bonus percent
+func (s *server) ComputeSalary(ctx context.Context, req *pb.SalaryRequest) (*pb.SalaryResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("invalid request")
 	}
-	s.employees = append(s.employees, newEmp)
-	return &pb.AddEmployeeResponse{Employee: newEmp}, nil
+
+	total := req.Base + (req.Base * req.BonusPercent / 100)
+	msg := fmt.Sprintf("Salary computed for %s", req.Name)
+
+	return &pb.SalaryResponse{
+		Name:         req.Name,
+		TotalSalary:  total,
+		Message:      msg,
+	}, nil
 }
 
 func main() {
@@ -37,16 +37,12 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterEmployeeServiceServer(grpcServer, &server{
-		employees: []*pb.Employee{
-			{Id: 1, Name: "Rohit", Age: 30, Company: "Lupin", Health: "Fit"},
-			{Id: 2, Name: "Aarti", Age: 28, Company: "JK Tyres", Health: "Needs checkup"},
-		},
-	})
+	s := grpc.NewServer()
+	pb.RegisterSalaryServiceServer(s, &server{})
 
-	fmt.Println("gRPC server running on port :50051")
-	if err := grpcServer.Serve(lis); err != nil {
+	fmt.Println("Salary gRPC service running on :50051 ...")
+
+	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
