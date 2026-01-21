@@ -39,7 +39,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Broadcast to all clients
 		for _, c := range clients {
-			c.WriteMessage(websocket.TextMessage, []byte("📢 Update: "+string(msg)))
+			c.WriteMessage(websocket.TextMessage, []byte("Update: "+string(msg)))
 		}
 	}
 }
