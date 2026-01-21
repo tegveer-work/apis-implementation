@@ -26,3 +26,11 @@ func RecieveHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Webhook received successfully")
 }
+
+func main() {
+	http.HandleFunc("/webhook", RecieveHandler)
+	log.Println("Starting server on :8080")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalf("Server failed to start: %v", err)
+	}
+}
